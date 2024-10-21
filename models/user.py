@@ -9,4 +9,4 @@ class Users(Base):
     full_name = Column(String(50), nullable=False)
     email = Column(String(50), nullable=False)
     status = Column(Integer, nullable=False)
-    hashed_password = Column(String(50), nullable=False)
+    hashed_password = Column(String(100), nullable=False)

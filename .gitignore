@@ -1,1 +1,8 @@
+#virtual environment
 venv
+
+#files generated from python
+__pycache__
+models/__pycache__
+routers/__pycache__
+schemas/__pycache__

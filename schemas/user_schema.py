@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic             import BaseModel
+from hash_password        import get_password_hash   #function for hash
+
 
 class User(BaseModel):
     username: str
     full_name: str 
     email: str 
     status: int
-
-class UserInDB(User):
-    hashed_password: str
+    hashed_password: get_password_hash
