@@ -1,10 +1,11 @@
 from pydantic import BaseModel
+from datetime import date
 
-class Voos(BaseModel):
-    id_voo: int
+class Voo(BaseModel):
+    data_voo: date
     horario_voo: str
-    origem: str
-    destino: str
-    comphania = str
-    tarifa = float
-    vagas = int
+    origem: int
+    destino: int
+    #companhia:str
+    tarifa: str
+    vagas: int

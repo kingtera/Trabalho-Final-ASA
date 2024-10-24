@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-class Aeroportos(BaseModel):
-    id_aeroporto: int
+class Aeroporto(BaseModel):
     nome: str
     cidade: str

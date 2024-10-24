@@ -5,10 +5,10 @@ class Voos(Base):
     __tablename__='voos'
 
     id_voo = Column(Integer, primary_key=True, autoincrement=True)
-    # data_voo = Column(DATE, nullable=False) FOREIGN KEY?
+    data_voo = Column(DATE, nullable=False)
     horario_voo = Column(TIMESTAMP(timezone=True), nullable=False)
-    origem = Column(String(50), nullable=False)
-    destino = Column(String(50), nullable=False)
-    companhia = Column(String(50), nullable=False)
-    tarifa = Column(Float)
+    origem = Column(Integer, ForeignKey('aeroportos.id_aeroporto'))
+    destino = Column(Integer, ForeignKey('aeroportos.id_aeroporto'))
+    #companhia = Column(String(50), ForeignKey('companhias.nome'))
+    tarifa = Column(String(50))
     vagas = Column(Integer, server_default = "0")

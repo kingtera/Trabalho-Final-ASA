@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
 class Ticket(BaseModel):
-    id_ticket: int
+    voo: int
+    passageiro: int
     cod_reserva: int
