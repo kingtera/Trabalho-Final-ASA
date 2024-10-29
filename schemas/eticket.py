@@ -1,7 +1,7 @@
-# from pydantic import BaseModel
+from pydantic import BaseModel
 
-# class Ticket(BaseModel):
-#     voo: int
-#     passageiro: int
-#     cod_reserva: int
+class Ticket(BaseModel):
+    voo: int
+    passageiro: int
+    cod_reserva: int
     
