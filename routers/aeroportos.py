@@ -1,6 +1,6 @@
 from fastapi          import APIRouter, Depends, HTTPException, Response, status
 from schemas.aeroportos   import Aeroporto
-from models.database  import get_db
+from database  import get_db
 from models.aeroportos    import Aeroportos
 from sqlalchemy.orm   import Session
 import logging

@@ -1,5 +1,5 @@
 from sqlalchemy import String, Integer, DateTime, Column, TIMESTAMP, text, ForeignKey, DATE
-from .database import Base
+from database import Base
 
 class Voos(Base):
     __tablename__='voos'
