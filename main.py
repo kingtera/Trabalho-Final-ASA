@@ -31,10 +31,10 @@ app.include_router(router_voos)
 
 
 
-Base.metadata.create_all(bind=engine);
+# Base.metadata.create_all(bind=engine);
 
-app = FastAPI();
+# app = FastAPI();
 
-app.include_router(login_route);
-app.include_router(voos_route);
-app.include_router(eticket_route);
+# app.include_router(login_route);
+# app.include_router(voos_route);
+# app.include_router(eticket_route);
