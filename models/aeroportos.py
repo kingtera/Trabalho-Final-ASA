@@ -1,5 +1,5 @@
 from sqlalchemy import String, Integer, Float, Column, TIMESTAMP, text, ForeignKey, DATE
-from .database import Base
+from database import Base
 
 class Aeroportos(Base):
     __tablename__='aeroportos'

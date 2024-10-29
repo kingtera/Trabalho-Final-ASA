@@ -1,6 +1,6 @@
 from fastapi          import APIRouter, Depends, HTTPException, Response, status
 from schemas.voos   import Voo
-from models.database  import get_db
+from database  import get_db
 from models.voos    import Voos
 from sqlalchemy.orm   import Session
 import logging

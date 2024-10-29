@@ -2,7 +2,7 @@ from typing               import Annotated
 from fastapi              import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security     import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing               import Annotated
-from database_login       import get_db
+from database       import get_db
 from models.user          import Users
 from models.eticket          import Tickets
 from schemas.user  import User
@@ -41,7 +41,7 @@ def get(current_user: Annotated[User, Depends(get_current_active_user)], db: Ses
     etickets_list = []
     for eticket in all_etickets:
         item = {"id": eticket.id_ticket,
-                "username": eticket.passageiro}
+                "id_user": eticket.passageiro}
         etickets_list.append(item)       
     logging.info(etickets_list)
     return etickets_list
