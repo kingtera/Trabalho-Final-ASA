@@ -10,6 +10,7 @@ from schemas.eticket  import Ticket
 from sqlalchemy.orm       import Session
 import logging
 from pydantic import BaseModel
+from .login import get_current_active_user
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -34,8 +35,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 #CRUD ETICKETS
 @router.get("/etickets")
-def get(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
-    all_etickets = db.query(Tickets).all()
+def get(current_user: Annotated[User, Depends(get_current_active_user)], db: Session = Depends(get_db)):
+    all_etickets = db.query(Tickets).filter(Tickets.passageiro == current_user.id)
     logging.info("GET_ALL_ETICKETS")
     etickets_list = []
     for eticket in all_etickets:
@@ -43,14 +44,19 @@ def get(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get
                 "username": eticket.passageiro}
         etickets_list.append(item)       
     logging.info(etickets_list)
-    return all_etickets
+    return etickets_list
 
 
 @router.post("/eticket")
-async def create_eticket(token: Annotated[str, Depends(oauth2_scheme)], ticket: Ticket, db: Session = Depends(get_db)):
-    new_ticket = Tickets(**ticket.model_dump())
+async def create_eticket(current_user: Annotated[User, Depends(get_current_active_user)], ticket: Ticket, db: Session = Depends(get_db)):
+    new_ticket = Tickets(
+        voo=ticket.voo,
+        passageiro=current_user.id,
+        cod_reserva=ticket.cod_reserva
+    )
+
     try:
-        
+
         db.add(new_ticket)
         db.commit()
         db.refresh(new_ticket)
