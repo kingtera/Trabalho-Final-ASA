@@ -3,7 +3,7 @@ from fastapi              import APIRouter, Depends, HTTPException, Response, st
 from fastapi.security     import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing               import Annotated
 from database       import get_db
-from models.user          import Users
+from models.voos          import Voos
 from models.eticket          import Tickets
 from schemas.user  import User
 from schemas.eticket  import Ticket
@@ -36,12 +36,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 #CRUD ETICKETS
 @router.get("/etickets")
 def get(current_user: Annotated[User, Depends(get_current_active_user)], db: Session = Depends(get_db)):
-    all_etickets = db.query(Tickets).filter(Tickets.passageiro == current_user.id)
+    all_etickets = db.query(Tickets).filter(Tickets.usr_comprador == current_user.id)
     logging.info("GET_ALL_ETICKETS")
     etickets_list = []
     for eticket in all_etickets:
         item = {"id": eticket.id_ticket,
-                "id_user": eticket.passageiro}
+                "id_user": eticket.usr_comprador}
         etickets_list.append(item)       
     logging.info(etickets_list)
     return etickets_list
@@ -51,9 +51,20 @@ def get(current_user: Annotated[User, Depends(get_current_active_user)], db: Ses
 async def create_eticket(current_user: Annotated[User, Depends(get_current_active_user)], ticket: Ticket, db: Session = Depends(get_db)):
     new_ticket = Tickets(
         voo=ticket.voo,
-        passageiro=current_user.id,
+        n_passagens = ticket.n_passagens,
+        usr_comprador=current_user.id,
         cod_reserva=ticket.cod_reserva
     )
+
+    voo = db.query(Voos).filter(Voos.id_voo == new_ticket.voo).first()
+    
+    if voo.vagas < new_ticket.n_passagens:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Vagas insuficientes no voo para o número de passageiros solicitado. Restam {voo.vagas} passagen(s) restante(s) para esse voo"
+        )
+    else:
+        voo.vagas = voo.vagas - new_ticket.n_passagens
 
     try:
 
