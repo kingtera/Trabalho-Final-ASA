@@ -4,7 +4,7 @@ from fastapi.security     import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing               import Annotated
 from database_login       import get_db
 from models.user          import Users
-from schemas.user_schema  import User
+from schemas.user  import User
 from sqlalchemy.orm       import Session
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
