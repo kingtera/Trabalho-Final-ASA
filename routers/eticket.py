@@ -8,9 +8,15 @@ from models.eticket          import Tickets
 from schemas.user  import User
 from schemas.eticket  import Ticket
 from sqlalchemy.orm       import Session
+from sqlalchemy.exc import SQLAlchemyError
 import logging
 from pydantic import BaseModel
 from .login import get_current_active_user
+
+from models.aeroportos              import Aeroportos
+from models.voos                    import Voos
+from schemas.aeroportos             import Aeroporto
+from schemas.voos                   import Voo
 
 # to get a string like this run:
 # openssl rand -hex 32
@@ -47,14 +53,28 @@ def get(current_user: Annotated[User, Depends(get_current_active_user)], db: Ses
     return etickets_list
 
 
+
 @router.post("/eticket")
 async def create_eticket(current_user: Annotated[User, Depends(get_current_active_user)], ticket: Ticket, db: Session = Depends(get_db)):
     new_ticket = Tickets(
         voo=ticket.voo,
-        passageiro=current_user.id,
+        numero_de_passageiros = ticket.numero_de_passageiros,
+        passageiro_titular= ticket.passageiro_titular,
         cod_reserva=ticket.cod_reserva
     )
+    
+    voo = db.query(Voos).filter(Voos.id_voo == new_ticket.voo).first()
 
+    
+    
+    if voo.vagas < new_ticket.numero_de_passageiros:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Vagas insuficientes no voo para o número de passageiros solicitado"
+        )
+    
+    vagas = voo.vagas - new_ticket.numero_de_passageiros
+    
     try:
 
         db.add(new_ticket)
