@@ -1,75 +1,62 @@
-from typing               import Annotated
-from fastapi              import APIRouter, Depends, HTTPException, Response, status
-from fastapi.security     import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing               import Annotated
-from database_login       import get_db
-from models.voos          import Voos
-from schemas.voos  import Voo
-from sqlalchemy.orm       import Session
+from fastapi          import APIRouter, Depends, HTTPException, Response, status
+from schemas.voos   import Voo
+from models.database  import get_db
+from models.voos    import Voos
+from sqlalchemy.orm   import Session
 import logging
-from pydantic import BaseModel
-
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 router = APIRouter()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-
-#CRUD VOOS
 @router.get("/voos")
 def get(db: Session = Depends(get_db)):
     all_voos = db.query(Voos).all()
-    logging.info("GET_ALL_voos")
-    voos_list = []
-    for voos in all_voos:
-        item = {"id": voos.id_voo,
-                "vagas": voos.vagas}
-        voos_list.append(item)       
-    logging.info(voos_list)
+    logging.info("GET_ALL_VOOS")
+    voos = []
+    for voo in all_voos:
+        item = {"id": voo.id_voo,
+                "data": voo.data_hora_voo}
+        voos.append(item)       
+    logging.info(voos)
     return all_voos
 
 
 @router.post("/voos")
-async def create_voo(voo: Voo, db: Session = Depends(get_db)):
-    new_Voo = Voos(**voo.model_dump())
+async def criar_voos(voo: Voo, db: Session = Depends(get_db)):
+    novo_voo = Voos(**voo.model_dump())
     try:
-        
-        db.add(new_Voo)
+        db.add(novo_voo)
         db.commit()
-        db.refresh(new_Voo)
+        db.refresh(novo_voo)
         logging.info("Voo criado com sucesso")
         return { "mensagem": "Voo criado com sucesso",
-                 "voo": new_Voo}
+                 "novo_voo": novo_voo}
     except Exception as e:
             logging.error(e)
-            return { "mensagem": "Problemas para inserir o new_Voo",
-                 "voo": new_Voo}
-    
+            return { "mensagem": "Problemas para adicionar voo",
+                 "novo_voo": novo_voo}
+
+ 
 @router.delete("/voos/{id}")
 def delete(id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
     delete_post = db.query(Voos).filter(Voos.id_voo == id)
     
     if delete_post == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Voo não existe")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Voo não encontrado")
     else:
         delete_post.delete(synchronize_session=False)
         db.commit()
-        logging.info("Voo deletado com sucesso")
-
     return Response(status_code=status.HTTP_204_NO_CONTENT)   
 
 
 @router.put("/voos/{id}")
-def update(id: int, voo:Voo, db:Session = Depends(get_db)):
+def update(id: int, voo: Voo, db:Session = Depends(get_db)):
     updated_post = db.query(Voos).filter(Voos.id_voo == id)
     updated_post.first()
     if updated_post == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'voo: {id} does not exist')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Professor: {id} does not exist')
     else:
         updated_post.update(voo.model_dump(), synchronize_session=False)
         db.commit()
-        logging.info("voo alterado com sucesso")
-
     return updated_post.first()
