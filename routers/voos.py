@@ -32,7 +32,7 @@ def get(db: Session = Depends(get_db)):
 
 
 @router.post("/voos")
-async def create_eticket(voo: Voo, db: Session = Depends(get_db)):
+async def create_voo(voo: Voo, db: Session = Depends(get_db)):
     new_Voo = Voos(**voo.model_dump())
     try:
         

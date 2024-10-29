@@ -34,7 +34,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 #CRUD ETICKETS
 @router.get("/etickets")
-def get(db: Session = Depends(get_db)):
+def get(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
     all_etickets = db.query(Tickets).all()
     logging.info("GET_ALL_ETICKETS")
     etickets_list = []
@@ -47,7 +47,7 @@ def get(db: Session = Depends(get_db)):
 
 
 @router.post("/eticket")
-async def create_eticket(ticket: Ticket, db: Session = Depends(get_db)):
+async def create_eticket(token: Annotated[str, Depends(oauth2_scheme)], ticket: Ticket, db: Session = Depends(get_db)):
     new_ticket = Tickets(**ticket.model_dump())
     try:
         
@@ -63,7 +63,7 @@ async def create_eticket(ticket: Ticket, db: Session = Depends(get_db)):
                  "ticket": new_ticket}
     
 @router.delete("/etickets/{id}")
-def delete(id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
+def delete(token: Annotated[str, Depends(oauth2_scheme)],id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
     delete_post = db.query(Tickets).filter(Tickets.id_ticket == id)
     
     if delete_post == None:
@@ -77,7 +77,7 @@ def delete(id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_
 
 
 @router.put("/etickets/{id}")
-def update(id: int, ticket:Ticket, db:Session = Depends(get_db)):
+def update(token: Annotated[str, Depends(oauth2_scheme)],id: int, ticket:Ticket, db:Session = Depends(get_db)):
     updated_post = db.query(Tickets).filter(Tickets.id_ticket == id)
     updated_post.first()
     if updated_post == None:
