@@ -16,7 +16,7 @@ def get(db: Session = Depends(get_db)):
     voos = []
     for voo in all_voos:
         item = {"id": voo.id_voo,
-                "data": voo.data_voo}
+                "data": voo.data_hora_voo}
         voos.append(item)       
     logging.info(voos)
     return all_voos

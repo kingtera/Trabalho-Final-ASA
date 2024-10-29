@@ -1,9 +1,9 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import datetime
 
 class Voo(BaseModel):
-    data_voo: date
-    horario_voo: str
+    data_hora_voo: datetime
+    #horario_voo: str
     origem: int
     destino: int
     #companhia:str
