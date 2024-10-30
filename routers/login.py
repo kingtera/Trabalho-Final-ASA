@@ -142,7 +142,7 @@ async def create_user(user: User, db: Session = Depends(get_db)):
     
 @router.delete("/users/{id}")
 def delete(id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
-    delete_post = db.query(Users).filter(Users.id == id)
+    delete_post = db.query(Users).filter(Users.id == id).first()
     
     if delete_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Usuario não existe")

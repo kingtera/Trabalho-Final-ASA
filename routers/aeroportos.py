@@ -42,7 +42,7 @@ async def criar_aeroporto(aeroporto: Aeroporto, db: Session = Depends(get_db)):
 
 @router.delete("/aeroportos/{id}")
 def delete(id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
-    delete_post = db.query(Aeroportos).filter(Aeroportos.id_aeroporto == id)
+    delete_post = db.query(Aeroportos).filter(Aeroportos.id_aeroporto == id).first()
     
     if delete_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Aeroporto não encontrado")

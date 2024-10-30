@@ -7,6 +7,7 @@ from models.voos          import Voos
 from models.eticket          import Tickets
 from schemas.user  import User
 from schemas.eticket  import Ticket
+from schemas.eticket_update import TicketUpdate
 from sqlalchemy.orm       import Session
 import logging
 from pydantic import BaseModel
@@ -80,8 +81,8 @@ async def create_eticket(current_user: Annotated[User, Depends(get_current_activ
                  "ticket": new_ticket}
     
 @router.delete("/etickets/{id}")
-def delete(token: Annotated[str, Depends(oauth2_scheme)],id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
-    delete_post = db.query(Tickets).filter(Tickets.id_ticket == id)
+def delete(current_user: Annotated[User, Depends(get_current_active_user)],id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
+    delete_post = db.query(Tickets).filter(Tickets.id_ticket == id).first()
     
     if delete_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Ticket não existe")
@@ -94,13 +95,31 @@ def delete(token: Annotated[str, Depends(oauth2_scheme)],id:int ,db: Session = D
 
 
 @router.put("/etickets/{id}")
-def update(token: Annotated[str, Depends(oauth2_scheme)],id: int, ticket:Ticket, db:Session = Depends(get_db)):
+def update_n_passagens(current_user: Annotated[User, Depends(get_current_active_user)],id: int, ticket:TicketUpdate, db:Session = Depends(get_db)):
     updated_post = db.query(Tickets).filter(Tickets.id_ticket == id)
-    updated_post.first()
-    if updated_post == None:
+    existing_ticket = updated_post.first()
+
+    if existing_ticket == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Ticket: {id} does not exist')
     else:
+        voo = db.query(Voos).filter(Voos.id_voo == existing_ticket.voo).first()
+        dif = ticket.n_passagens - existing_ticket.n_passagens
+
+        if dif > 0:
+            if voo.vagas < dif:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Vagas insuficientes no voo para o número de passageiros solicitado. Restam {voo.vagas} passagen(s) restante(s) para esse voo"
+                )
+            else:
+                voo.vagas = voo.vagas - dif
+        elif dif < 0:
+            voo.vagas = voo.vagas + (-dif)
+        else:
+            return {"msg":"Sem alteracao"}
+
         updated_post.update(ticket.model_dump(), synchronize_session=False)
+
         db.commit()
         logging.info("Ticket alterado com sucesso")
 

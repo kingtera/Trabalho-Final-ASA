@@ -40,7 +40,7 @@ async def criar_voos(voo: Voo, db: Session = Depends(get_db)):
  
 @router.delete("/voos/{id}")
 def delete(id:int ,db: Session = Depends(get_db), status_code = status.HTTP_204_NO_CONTENT):
-    delete_post = db.query(Voos).filter(Voos.id_voo == id)
+    delete_post = db.query(Voos).filter(Voos.id_voo == id).first()
     
     if delete_post == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Voo não encontrado")
