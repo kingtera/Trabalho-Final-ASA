@@ -8,4 +8,4 @@ class Tickets(Base):
     voo = Column(Integer, ForeignKey('voos.id_voo'))
     n_passagens = Column(Integer)
     usr_comprador = Column(Integer, ForeignKey('users.id'))
-    cod_reserva = Column(Integer, autoincrement = True)
+    cod_reserva = Column(String(50), nullable=False)
